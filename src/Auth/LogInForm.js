@@ -1,16 +1,19 @@
 import React, { useState } from 'react'
 
-import { Paper, TextField, Button, Typography } from '@material-ui/core'
+import { Paper, TextField, Button, Typography, CircularProgress } from '@material-ui/core'
 
 const styles = {
   center: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw', position: 'absolute', top: 0, left: 0 },
   paper: { maxWidth: 320, padding: 20 },
-  buttons: { display: 'flex', justifyContent: 'space-around', alignItems: 'center' }
+  buttons: { display: 'flex', justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' },
+  button: { marginBottom: 10 },
+  circural: { display: 'flex', justifyContent: 'center', width: 80 }
 }
 
 const LogInForm = props => {
   const [email, setEmail] = useState('')
   const [pwd, setPwd] = useState('')
+  const [circural, setCircural] = useState(false)
   return (
     <div style={styles.center}>
       <Paper style={styles.paper}>
@@ -39,18 +42,29 @@ const LogInForm = props => {
         />
         <div style={styles.buttons}>
           <Button
+            style={styles.button}
             color='primary'
             variant='contained'
-            onClick={() => console.log(email, pwd)}
+            onClick={() => setCircural(!circural)}
+            margin='normal'
           >
             Log In
           </Button>
+          <div style={styles.circural}>
+            {circural ? <CircularProgress /> : null}
+          </div>
           <Button
+            style={styles.button}
             color='secondary'
             variant='contained'
           >
             Register
           </Button>
+          <Button
+            style={{ marginLeft: 'auto', marginRight: 'auto' }}
+          >
+            forgot password?
+        </Button>
         </div>
       </Paper>
     </div>
