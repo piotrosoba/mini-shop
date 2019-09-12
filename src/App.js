@@ -5,13 +5,16 @@ import { BrowserRouter as Router } from "react-router-dom"
 
 import AppBar from './router/AppBar'
 import Drawer from './router/Drawer'
+import Auth from './Auth/Auth'
 
 const App = props => {
   return (
     <div>
       <Router>
-        <AppBar />
-        <Drawer />
+        <Auth>
+          <AppBar />
+          <Drawer />
+        </Auth>
       </Router>
     </div>
   )
