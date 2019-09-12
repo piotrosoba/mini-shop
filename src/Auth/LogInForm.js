@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 
+import { connect } from 'react-redux'
+import { addSnackbarActionCreator } from '../state/snackbars'
+
 import { Paper, TextField, Button, Typography, CircularProgress } from '@material-ui/core'
 
 const styles = {
@@ -12,8 +15,22 @@ const styles = {
 
 const LogInForm = props => {
   const [email, setEmail] = useState('')
+  const [forgotEmail, setForgotEmail] = useState('')
   const [pwd, setPwd] = useState('')
-  const [circural, setCircural] = useState(false)
+  const [forgotPanel, toggleForgot] = useState(false)
+  const [errors, setErrors] = useState({
+    email: false,
+    pwd: false
+  })
+  const [forgotError, setForgotError] = useState(false)
+
+  const validate = () => {
+    setErrors({
+      email: !email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/),
+      pwd: !pwd
+    })
+  }
+
   return (
     <div style={styles.center}>
       <Paper style={styles.paper}>
@@ -26,32 +43,39 @@ const LogInForm = props => {
         <TextField
           value={email}
           onChange={(evt) => setEmail(evt.target.value)}
+          onBlur={errors.email ? validate : null}
           fullWidth
           margin='normal'
           label='email'
           variant='outlined'
+          error={errors.email}
+          helperText={errors.email ? 'Wrong email!' : null}
         />
         <TextField
           value={pwd}
           onChange={(evt) => setPwd(evt.target.value)}
+          onBlur={errors.pwd ? validate : null}
           fullWidth
           margin='normal'
           label='password'
           variant='outlined'
           type='password'
+          error={errors.pwd}
         />
         <div style={styles.buttons}>
           <Button
             style={styles.button}
             color='primary'
             variant='contained'
-            onClick={() => setCircural(!circural)}
+            onClick={() => {
+              validate()
+            }}
             margin='normal'
           >
             Log In
           </Button>
           <div style={styles.circural}>
-            {circural ? <CircularProgress /> : null}
+            {false ? <CircularProgress /> : null}
           </div>
           <Button
             style={styles.button}
@@ -61,14 +85,55 @@ const LogInForm = props => {
             Register
           </Button>
           <Button
-            style={{ marginLeft: 'auto', marginRight: 'auto' }}
+            onClick={() => toggleForgot(!forgotPanel)}
           >
             forgot password?
         </Button>
         </div>
+        {forgotPanel ?
+          <div>
+            <TextField
+              value={forgotEmail}
+              onChange={(evt) => setForgotEmail(evt.target.value)}
+              onFocus={() => setForgotError(false)}
+              onBlur={() => setForgotError(!forgotEmail.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))}
+              fullWidth
+              margin='normal'
+              label='email'
+              variant='outlined'
+              error={forgotError}
+              helperText={forgotError ? 'Wrong email!' : null}
+            />
+            <Button
+              color='primary'
+              variant='contained'
+              fullWidth
+              onClick={() => {
+                if (!forgotEmail)
+                  setForgotError(true)
+
+                if (!forgotError && forgotEmail) {
+                  props._snackbar('Check your email!')
+                  toggleForgot(false)
+                }
+              }}
+            >
+              Send
+            </Button>
+          </div>
+          :
+          null
+        }
       </Paper>
     </div>
   )
 }
 
-export default LogInForm
+const mapDispatchToProps = dispatch => ({
+  _snackbar: (text, color, time) => dispatch(addSnackbarActionCreator(text, color, time))
+})
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(LogInForm)

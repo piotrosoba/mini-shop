@@ -1,10 +1,10 @@
 const ADD = 'snackbars/ADD'
 const REMOVE = 'snackbars/REMOVE'
 
-export const addSnackbarActionCreator = (text, color) => (dispatch, getState) => {
+export const addSnackbarActionCreator = (text, color = 'green', time = 3000) => (dispatch, getState) => {
   const key = Math.random().toString(16).slice(7)
   dispatch(addActionCreator(text, color, key))
-  setTimeout(() => dispatch(removeActionCreator(key)), 3000)
+  setTimeout(() => dispatch(removeActionCreator(key)), time)
 }
 
 const removeActionCreator = key => ({
