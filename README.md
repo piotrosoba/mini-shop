@@ -1,3 +1,3 @@
 ## This is small application to show my skills.
 
-Used technologies: React, Redux, Axios, REST API(Firebase), Material-UI
+Used technologies: React, Redux, REST API(Firebase), Material-UI
