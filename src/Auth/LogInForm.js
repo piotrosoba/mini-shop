@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { addSnackbarActionCreator } from '../state/snackbars'
 
-import { Paper, TextField, Button, Typography, CircularProgress } from '@material-ui/core'
+import { Paper, TextField, Button, Typography, CircularProgress, Collapse } from '@material-ui/core'
 
 const styles = {
   center: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw', position: 'absolute', top: 0, left: 0 },
@@ -81,6 +81,7 @@ const LogInForm = props => {
             style={styles.button}
             color='secondary'
             variant='contained'
+            onClick={props.toggleForm}
           >
             Register
           </Button>
@@ -90,40 +91,38 @@ const LogInForm = props => {
             forgot password?
         </Button>
         </div>
-        {forgotPanel ?
-          <div>
-            <TextField
-              value={forgotEmail}
-              onChange={(evt) => setForgotEmail(evt.target.value)}
-              onFocus={() => setForgotError(false)}
-              onBlur={() => setForgotError(!forgotEmail.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))}
-              fullWidth
-              margin='normal'
-              label='email'
-              variant='outlined'
-              error={forgotError}
-              helperText={forgotError ? 'Wrong email!' : null}
-            />
-            <Button
-              color='primary'
-              variant='contained'
-              fullWidth
-              onClick={() => {
-                if (!forgotEmail)
-                  setForgotError(true)
 
-                if (!forgotError && forgotEmail) {
-                  props._snackbar('Check your email!')
-                  toggleForgot(false)
-                }
-              }}
-            >
-              Send
+        <Collapse in={forgotPanel}>
+          <TextField
+            value={forgotEmail}
+            onChange={(evt) => setForgotEmail(evt.target.value)}
+            onFocus={() => setForgotError(false)}
+            onBlur={() => setForgotError(!forgotEmail.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))}
+            fullWidth
+            margin='normal'
+            label='email'
+            variant='outlined'
+            error={forgotError}
+            helperText={forgotError ? 'Wrong email!' : null}
+          />
+          <Button
+            color='primary'
+            variant='contained'
+            fullWidth
+            onClick={() => {
+              if (!forgotEmail)
+                setForgotError(true)
+
+              if (!forgotError && forgotEmail) {
+                props._snackbar('Check your email!')
+                toggleForgot(false)
+              }
+            }}
+          >
+            Send
             </Button>
-          </div>
-          :
-          null
-        }
+        </Collapse>
+
       </Paper>
     </div>
   )
