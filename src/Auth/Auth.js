@@ -16,7 +16,7 @@ class Auth extends React.Component {
 
   render() {
     return (
-      false ?
+      this.props._isLogged ?
         this.props.children
         :
         this.state.form ?
@@ -31,7 +31,9 @@ class Auth extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({})
+const mapStateToProps = state => ({
+  _isLogged: state.auth.isLogged
+})
 
 const mapDispatchToProps = dispatch => ({})
 

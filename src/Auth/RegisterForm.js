@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 
 import { connect } from 'react-redux'
+import { registerUserAsyncActionCreator } from '../state/auth'
+import { addSnackbarActionCreator } from '../state/snackbars'
 
 import { Paper, TextField, Button, CircularProgress, Typography } from '@material-ui/core'
 
@@ -19,12 +21,47 @@ const RegisterForm = props => {
   const [pwdError, setPwdError] = useState(false)
   const [pwd2, setPwd2] = useState('')
   const [pwd2Error, setPwd2Error] = useState(false)
+  const [showCircural, setShowCircural] = useState(false)
 
   const emailValidate = (string = email) => setEmailError(!string.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))
   const pwdValidate = (string = pwd) => setPwdError(string.length < 8)
   const pwd2Validate = (string = pwd2) => setPwd2Error(pwd !== string)
 
   const signInEnable = !!email && !!pwd && !!pwd2 && !emailError && !pwdError && !pwd2Error && pwd2 === pwd
+
+  const onSubmit = () => {
+    setShowCircural(true)
+    props._register(email, pwd)
+      .catch(r => {
+        setShowCircural(false)
+        let message = 'Something went wrong, try again later'
+        switch (r.response && r.response.data.error && r.response.data.error.message) {
+          case 'EMAIL_EXISTS':
+            message = 'User with this email is already registered'
+            break
+          case 'OPERATION_NOT_ALLOWED':
+            message = 'This password is not allowed, try with another'
+            break
+          case 'TOO_MANY_ATTEMPTS_TRY_LATER':
+            message = 'Too many attemps, try again later'
+            break
+          default:
+            break
+        }
+        props._snackbar(message, 'red')
+      })
+  }
+
+  const submitOnEnter = evt => {
+    if (evt.key === 'Enter')
+      if (signInEnable)
+        onSubmit()
+      else {
+        emailValidate()
+        pwdValidate()
+        pwd2Validate()
+      }
+  }
 
   return (
     <div style={styles.center}>
@@ -37,6 +74,7 @@ const RegisterForm = props => {
         </Typography>
         <TextField
           value={email}
+          onKeyPress={submitOnEnter}
           onChange={evt => {
             setEmail(evt.target.value)
             if (emailError)
@@ -54,6 +92,7 @@ const RegisterForm = props => {
         />
         <TextField
           value={pwd}
+          onKeyPress={submitOnEnter}
           onChange={evt => {
             setPwd(evt.target.value)
             if (pwdError) {
@@ -77,6 +116,7 @@ const RegisterForm = props => {
         />
         <TextField
           value={pwd2}
+          onKeyPress={submitOnEnter}
           onChange={evt => {
             setPwd2(evt.target.value)
             if (pwd2Error)
@@ -98,15 +138,14 @@ const RegisterForm = props => {
             style={styles.button}
             color='primary'
             variant='contained'
-            onClick={() => {
-            }}
+            onClick={onSubmit}
             margin='normal'
             disabled={!signInEnable}
           >
             Sign in
           </Button>
           <div style={styles.circural}>
-            {false ? <CircularProgress /> : null}
+            {showCircural ? <CircularProgress /> : null}
           </div>
           <Button
             style={styles.button}
@@ -124,7 +163,10 @@ const RegisterForm = props => {
 
 const mapStateToProps = state => ({})
 
-const mapDispatchToProps = dispatch => ({})
+const mapDispatchToProps = dispatch => ({
+  _register: (email, pwd) => dispatch(registerUserAsyncActionCreator(email, pwd)),
+  _snackbar: (text, color) => dispatch(addSnackbarActionCreator(text, color))
+})
 
 export default connect(
   mapStateToProps,
