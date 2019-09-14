@@ -26,8 +26,6 @@ const LogInForm = props => {
 
   const [circural, setCircural] = useState(false)
 
-  const signInEnable = !!email && !!pwd && !emailError && !pwdError
-
   const emailValidate = (string = email) => {
     const isError = (!string.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))
     setEmailError(isError)
@@ -37,39 +35,65 @@ const LogInForm = props => {
     setPwdError(!string)
     return !string
   }
+  const forgotEmailValidate = (string = forgotEmail) => {
+    const isError = (!string.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))
+    setForgotError(isError)
+    return isError
+  }
 
   const onSubmit = () => {
-    setCircural(true)
-    props._logIn(email, pwd)
-      .catch(r => {
-        setCircural(false)
-        let message = 'Something went wrong, try again later'
-        switch (r.response && r.response.data.error && r.response.data.error.message) {
-          case 'EMAIL_NOT_FOUND':
-            message = 'Invalid email or password'
-            break
-          case 'INVALID_PASSWORD':
-            message = 'Invalid email or password'
-            break
-          case 'USER_DISABLED':
-            message = 'This account is banned'
-            break
-          default:
-            break
-        }
-        props._snackbar(message, 'red')
-      })
+    const isEmailError = emailValidate()
+    const isPwdError = pwdValidate()
+    if (!isEmailError && !isPwdError) {
+      setCircural(true)
+      props._logIn(email, pwd)
+        .catch(r => {
+          setCircural(false)
+          let message = 'Something went wrong, try again later'
+          switch (r.response && r.response.data.error && r.response.data.error.message) {
+            case 'EMAIL_NOT_FOUND':
+              message = 'Invalid email or password'
+              break
+            case 'INVALID_PASSWORD':
+              message = 'Invalid email or password'
+              break
+            case 'USER_DISABLED':
+              message = 'This account is banned'
+              break
+            default:
+              break
+          }
+          props._snackbar(message, 'red')
+        })
+    }
   }
 
   const submitOnEnter = evt => {
-    if (evt.key === 'Enter' && !emailValidate() && !pwdValidate() && !!email && !!pwd)
+    if (evt.key === 'Enter')
       onSubmit()
   }
 
   const onSubmitPwdReset = () => {
-    props._resetPwd(forgotEmail)
-    //dokonczyc przypominanie hasla na enter
-    //dodac validacje
+    if (!forgotEmailValidate()) {
+      setCircural(true)
+      props._resetPwd(forgotEmail)
+        .then(() => {
+          props._snackbar('Check your email')
+          toggleForgot(false)
+        })
+        .catch((r) => {
+          let message = 'Something went wrong, try again later'
+          if (r.response.data.error.message === 'EMAIL_NOT_FOUND')
+            message = 'Email not found'
+          props._snackbar(message, 'red')
+        })
+        .finally(() => setCircural(false))
+    }
+  }
+
+  const submitForgotOnEnter = evt => {
+    if (evt.key === 'Enter')
+      onSubmitPwdReset()
   }
 
   return (
@@ -80,6 +104,10 @@ const LogInForm = props => {
           variant='h4'
         >
           Please log in!
+        </Typography>
+        <Typography
+          align='center'>
+          (you can use: example@example.com)
         </Typography>
         <TextField
           value={email}
@@ -120,7 +148,6 @@ const LogInForm = props => {
             variant='contained'
             onClick={onSubmit}
             margin='normal'
-            disabled={!signInEnable}
           >
             Log In
           </Button>
@@ -145,9 +172,13 @@ const LogInForm = props => {
         <Collapse in={forgotPanel}>
           <TextField
             value={forgotEmail}
-            onChange={(evt) => setForgotEmail(evt.target.value)}
-            onFocus={() => setForgotError(false)}
-            onBlur={() => setForgotError(!forgotEmail.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))}
+            onChange={(evt) => {
+              setForgotEmail(evt.target.value)
+              if (forgotError)
+                forgotEmailValidate(evt.target.value)
+            }}
+            onBlur={() => forgotEmailValidate()}
+            onKeyPress={submitForgotOnEnter}
             fullWidth
             margin='normal'
             label='email'
