@@ -23,9 +23,21 @@ const RegisterForm = props => {
   const [pwd2Error, setPwd2Error] = useState(false)
   const [showCircural, setShowCircural] = useState(false)
 
-  const emailValidate = (string = email) => setEmailError(!string.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))
-  const pwdValidate = (string = pwd) => setPwdError(string.length < 8)
-  const pwd2Validate = (string = pwd2) => setPwd2Error(pwd !== string)
+  const emailValidate = (string = email) => {
+    const isError = (!string.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))
+    setEmailError(isError)
+    return isError
+  }
+  const pwdValidate = (string = pwd) => {
+    const isError = (string.length < 8)
+    setPwdError(isError)
+    return isError
+  }
+  const pwd2Validate = (string = pwd2) => {
+    const isError = (pwd !== string)
+    setPwd2Error(isError)
+    return isError
+  }
 
   const signInEnable = !!email && !!pwd && !!pwd2 && !emailError && !pwdError && !pwd2Error && pwd2 === pwd
 
@@ -53,14 +65,8 @@ const RegisterForm = props => {
   }
 
   const submitOnEnter = evt => {
-    if (evt.key === 'Enter')
-      if (signInEnable)
-        onSubmit()
-      else {
-        emailValidate()
-        pwdValidate()
-        pwd2Validate()
-      }
+    if (evt.key === 'Enter' && !emailValidate() && pwdValidate() && pwd2Validate())
+      onSubmit()
   }
 
   return (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 import { connect } from 'react-redux'
+import { logInAsyncActionCreator, resetPasswordAsyncActionCreator } from '../state/auth'
 import { addSnackbarActionCreator } from '../state/snackbars'
 
 import { Paper, TextField, Button, Typography, CircularProgress, Collapse } from '@material-ui/core'
@@ -15,20 +16,60 @@ const styles = {
 
 const LogInForm = props => {
   const [email, setEmail] = useState('')
-  const [forgotEmail, setForgotEmail] = useState('')
+  const [emailError, setEmailError] = useState(false)
+  const [pwdError, setPwdError] = useState(false)
   const [pwd, setPwd] = useState('')
-  const [forgotPanel, toggleForgot] = useState(false)
-  const [errors, setErrors] = useState({
-    email: false,
-    pwd: false
-  })
-  const [forgotError, setForgotError] = useState(false)
 
-  const validate = () => {
-    setErrors({
-      email: !email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/),
-      pwd: !pwd
-    })
+  const [forgotPanel, toggleForgot] = useState(false)
+  const [forgotError, setForgotError] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+
+  const [circural, setCircural] = useState(false)
+
+  const signInEnable = !!email && !!pwd && !emailError && !pwdError
+
+  const emailValidate = (string = email) => {
+    const isError = (!string.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/))
+    setEmailError(isError)
+    return isError
+  }
+  const pwdValidate = (string = pwd) => {
+    setPwdError(!string)
+    return !string
+  }
+
+  const onSubmit = () => {
+    setCircural(true)
+    props._logIn(email, pwd)
+      .catch(r => {
+        setCircural(false)
+        let message = 'Something went wrong, try again later'
+        switch (r.response && r.response.data.error && r.response.data.error.message) {
+          case 'EMAIL_NOT_FOUND':
+            message = 'Invalid email or password'
+            break
+          case 'INVALID_PASSWORD':
+            message = 'Invalid email or password'
+            break
+          case 'USER_DISABLED':
+            message = 'This account is banned'
+            break
+          default:
+            break
+        }
+        props._snackbar(message, 'red')
+      })
+  }
+
+  const submitOnEnter = evt => {
+    if (evt.key === 'Enter' && !emailValidate() && !pwdValidate() && !!email && !!pwd)
+      onSubmit()
+  }
+
+  const onSubmitPwdReset = () => {
+    props._resetPwd(forgotEmail)
+    //dokonczyc przypominanie hasla na enter
+    //dodac validacje
   }
 
   return (
@@ -42,40 +83,49 @@ const LogInForm = props => {
         </Typography>
         <TextField
           value={email}
-          onChange={(evt) => setEmail(evt.target.value)}
-          onBlur={errors.email ? validate : null}
+          onChange={(evt) => {
+            setEmail(evt.target.value)
+            if (emailError)
+              emailValidate(evt.target.value)
+          }}
+          onBlur={() => emailValidate()}
+          onKeyPress={submitOnEnter}
           fullWidth
           margin='normal'
           label='email'
           variant='outlined'
-          error={errors.email}
-          helperText={errors.email ? 'Wrong email!' : null}
+          error={emailError}
+          helperText={emailError ? 'Wrong email!' : null}
         />
         <TextField
           value={pwd}
-          onChange={(evt) => setPwd(evt.target.value)}
-          onBlur={errors.pwd ? validate : null}
+          onChange={(evt) => {
+            setPwd(evt.target.value)
+            if (pwdError)
+              pwdValidate(evt.target.value)
+          }}
+          onBlur={() => pwdValidate()}
+          onKeyPress={submitOnEnter}
           fullWidth
           margin='normal'
           label='password'
           variant='outlined'
           type='password'
-          error={errors.pwd}
+          error={pwdError}
         />
         <div style={styles.buttons}>
           <Button
             style={styles.button}
             color='primary'
             variant='contained'
-            onClick={() => {
-              validate()
-            }}
+            onClick={onSubmit}
             margin='normal'
+            disabled={!signInEnable}
           >
             Log In
           </Button>
           <div style={styles.circural}>
-            {false ? <CircularProgress /> : null}
+            {circural ? <CircularProgress /> : null}
           </div>
           <Button
             style={styles.button}
@@ -109,15 +159,7 @@ const LogInForm = props => {
             color='primary'
             variant='contained'
             fullWidth
-            onClick={() => {
-              if (!forgotEmail)
-                setForgotError(true)
-
-              if (!forgotError && forgotEmail) {
-                props._snackbar('Check your email!')
-                toggleForgot(false)
-              }
-            }}
+            onClick={onSubmitPwdReset}
           >
             Send
             </Button>
@@ -129,7 +171,9 @@ const LogInForm = props => {
 }
 
 const mapDispatchToProps = dispatch => ({
-  _snackbar: (text, color, time) => dispatch(addSnackbarActionCreator(text, color, time))
+  _snackbar: (text, color, time) => dispatch(addSnackbarActionCreator(text, color, time)),
+  _logIn: (email, pwd) => dispatch(logInAsyncActionCreator(email, pwd)),
+  _resetPwd: email => dispatch(resetPasswordAsyncActionCreator(email))
 })
 
 export default connect(
