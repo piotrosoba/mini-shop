@@ -2,11 +2,13 @@ import axios from 'axios'
 import jwt from 'jsonwebtoken'
 import { fullScreenCircural } from './fullScreenCircural'
 import { addSnackbarActionCreator } from './snackbars'
+import { saveUserAcyncActionCreator, getUserFromBaseAsyncActionCreator } from './user'
 
 import { REGISTER_URL, LOG_IN_URL, RESET_PASSWORD, REFRESH_TOKEN_URL } from '../consts/firebase'
 
 const SAVE_DECODED_TOKEN = 'auth/SAVE_DECODED_TOKEN'
 const LOG_OUT = 'auth/LOG_OUT'
+const LOG_IN = 'auth/LOG_IN'
 
 export const fetchWithTokenAndProgress = (url, method = 'get', data = {}) => (dispatch) => {
   dispatch(fullScreenCircural.add())
@@ -33,18 +35,19 @@ export const fetchWithToken = (url, method = 'get', data = {}) => (dispatch, get
   })
     .catch(r => {
       const refreshToken = getState().auth.refreshToken || localStorage.getItem('refreshToken')
-      if (r.response.statusText === 'Unauthorized') { }
-      return dispatch(useRefreshToken(refreshToken))
-        .catch(() => {
-          dispatch(logOut())
-          dispatch(addSnackbarActionCreator('Your session expired, log in again', 'red'))
-          return Promise.reject(r)
-        })
-        .then(() => axios({
-          url: getUrlWithToken(),
-          method,
-          data
-        }))
+      if (r.response && r.response.statusText === 'Unauthorized') {
+        return dispatch(useRefreshToken(refreshToken))
+          .catch(() => {
+            dispatch(logOutActionCreator())
+            dispatch(addSnackbarActionCreator('Your session expired, log in again', 'red'))
+            return Promise.reject(r)
+          })
+          .then(() => axios({
+            url: getUrlWithToken(),
+            method,
+            data
+          }))
+      }
     })
 }
 
@@ -61,7 +64,9 @@ export const registerUserAsyncActionCreator = (email, password) => (dispatch) =>
       if (response && response.data) {
         const idToken = response.data.idToken
         const refreshToken = response.data.refreshToken
-        dispatch(saveAndDecodeToken(idToken, refreshToken))
+        dispatch(saveAndDecodeTokenActionCreator(idToken, refreshToken))
+        dispatch(saveUserAcyncActionCreator())
+        dispatch(logInActionCreator())
       }
       return response
     })
@@ -81,7 +86,9 @@ export const logInAsyncActionCreator = (email, password) => (dispatch) => {
       if (response && response.data) {
         const idToken = response.data.idToken
         const refreshToken = response.data.refreshToken
-        dispatch(saveAndDecodeToken(idToken, refreshToken))
+        dispatch(saveAndDecodeTokenActionCreator(idToken, refreshToken))
+        dispatch(getUserFromBaseAsyncActionCreator())
+          .then(() => dispatch(logInActionCreator()))
       }
       return response
     })
@@ -104,10 +111,21 @@ export const checkIsUserLoggedIn = () => (dispatch) => {
 
   const expires = idToken ? jwt.decode(idToken).exp * 1000 : 0
   if (Date.now() < expires && refreshToken) {
-    dispatch(saveAndDecodeToken(idToken, refreshToken))
+    dispatch(saveAndDecodeTokenActionCreator(idToken, refreshToken))
+    dispatch(fullScreenCircural.add())
+    dispatch(getUserFromBaseAsyncActionCreator())
+      .then(() => dispatch(logInActionCreator()))
+      .finally(() => dispatch(fullScreenCircural.remove()))
   } else if (refreshToken) {
     dispatch(fullScreenCircural.add())
     dispatch(useRefreshToken(refreshToken))
+      .then(() => {
+        dispatch(fullScreenCircural.add())
+        dispatch(getUserFromBaseAsyncActionCreator())
+          .then(() => dispatch(logInActionCreator()))
+          .finally(() => dispatch(fullScreenCircural.remove()))
+
+      })
       .finally(() => dispatch(fullScreenCircural.remove()))
   }
 }
@@ -123,31 +141,30 @@ const useRefreshToken = refreshToken => dispatch => {
   })
     .then(response => {
       if (response.data)
-        dispatch(saveAndDecodeToken(response.data.id_token, response.data.refresh_token))
+        dispatch(saveAndDecodeTokenActionCreator(response.data.id_token, response.data.refresh_token))
       return response
     })
 }
 
-export const logOut = () => dispatch => {
+export const logOutActionCreator = () => {
   localStorage.removeItem('refreshToken')
   localStorage.removeItem('idToken')
-  dispatch(logOutActionCreator())
+  return { type: LOG_OUT }
 }
 
-const logOutActionCreator = () => ({ type: LOG_OUT })
+const logInActionCreator = () => ({ type: LOG_IN })
 
-const saveAndDecodeToken = (idToken, refreshToken) => (dispatch) => {
+const saveAndDecodeTokenActionCreator = (idToken, refreshToken) => {
   localStorage.setItem('idToken', idToken)
   localStorage.setItem('refreshToken', refreshToken)
-  dispatch(saveDecodedTokenActionCreator(jwt.decode(idToken), idToken, refreshToken))
+  const decodedToken = jwt.decode(idToken)
+  return {
+    type: SAVE_DECODED_TOKEN,
+    decodedToken,
+    idToken,
+    refreshToken
+  }
 }
-
-const saveDecodedTokenActionCreator = (decodedToken, idToken, refreshToken) => ({
-  type: SAVE_DECODED_TOKEN,
-  decodedToken,
-  idToken,
-  refreshToken
-})
 
 const initialState = {
   isLogged: false,
@@ -161,10 +178,14 @@ export default (state = initialState, action) => {
     case SAVE_DECODED_TOKEN:
       return {
         ...state,
-        isLogged: true,
         idToken: action.idToken,
         refreshToken: action.refreshToken,
         ...action.decodedToken
+      }
+    case LOG_IN:
+      return {
+        ...state,
+        isLogged: true
       }
     case LOG_OUT: {
       return {

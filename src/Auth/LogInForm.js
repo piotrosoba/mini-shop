@@ -107,7 +107,7 @@ const LogInForm = props => {
         </Typography>
         <Typography
           align='center'>
-          (you can use: example@example.com)
+          (you can use: example@example.com / 12345678)
         </Typography>
         <TextField
           value={email}

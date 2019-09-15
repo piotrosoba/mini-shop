@@ -5,12 +5,14 @@ import drawer from './state/drawer'
 import fullScreenCircural from './state/fullScreenCircural'
 import snackbars from './state/snackbars'
 import auth from './state/auth'
+import user from './state/user'
 
 const reducer = combineReducers({
   drawer,
   fullScreenCircural,
   snackbars,
-  auth
+  auth,
+  user
 })
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose

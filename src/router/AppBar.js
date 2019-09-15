@@ -2,6 +2,7 @@ import React from 'react'
 
 import { connect } from 'react-redux'
 import { drawerOpenActionCreator } from '../state/drawer'
+import { logOutActionCreator } from '../state/auth'
 
 import MuiAppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -22,6 +23,11 @@ function AppBar(props) {
           >
             <MenuIcon />
           </IconButton>
+          <IconButton
+            onClick={props._logOut}
+          >
+            log out
+          </IconButton>
         </Toolbar>
       </MuiAppBar>
     </div>
@@ -30,6 +36,7 @@ function AppBar(props) {
 
 const mapDispatchToProps = dispatch => ({
   _open: () => dispatch(drawerOpenActionCreator()),
+  _logOut: () => dispatch(logOutActionCreator())
 })
 
 export default connect(
