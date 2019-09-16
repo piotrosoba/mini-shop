@@ -51,6 +51,7 @@ const ChangePassword = props => {
   if (props._userEmail === 'example@example.com') {
     return (
       <Typography
+        style={{ marginTop: 60 }}
         variant='h4'
         align='center'
       >
@@ -61,7 +62,7 @@ const ChangePassword = props => {
 
   return (
     <div
-      style={{ maxWidth: 320, margin: '30px auto', display: 'flex', alignItems: 'center', flexDirection: 'column  ' }}
+      style={{ maxWidth: 320, margin: '30px auto', display: 'flex', alignItems: 'center', flexDirection: 'column' }}
     >
       <Typography
         variant='h4'

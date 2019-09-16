@@ -49,7 +49,11 @@ function AppBar(props) {
             variant="h6"
             onClick={() => props.history.push('/')}
           >
-            Mini Shop
+            <IconButton
+              color='inherit'
+            >
+              Mini Shop
+            </IconButton>
           </Typography>
           <IconButton
             color='inherit'
