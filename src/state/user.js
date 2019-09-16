@@ -8,7 +8,6 @@ export const getUserFromBaseAsyncActionCreator = () => (dispatch, getState) => {
   if (userId)
     return dispatch(fetchWithToken(URL + 'users/' + userId + '.json'))
       .then(r => {
-        console.log(r.data)
         dispatch(saveUserActionCreator(r.data))
         return r
       })
@@ -21,8 +20,6 @@ export const saveUserAcyncActionCreator = () => (dispatch, getState) => {
   const user = {
     userId,
     userEmail,
-    basket: [],
-    items: [],
     wallet: 100
   }
   if (userId)
@@ -43,7 +40,6 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case SAVE_USER:
       return {
-        ...state,
         ...action.user
       }
     default:

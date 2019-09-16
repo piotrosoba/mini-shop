@@ -16,6 +16,10 @@ const App = props => {
           <AppBar />
           <Drawer />
           <Route path='/' exact component={Dashbord} />
+          <Route path='/profile' exact component={() => <p>bedzie profil</p>} />
+          <Route path='/change-password' exact component={() => <p>change password</p>} />
+          <Route path='/basket' exact component={() => <p>basket</p>} />
+          <Route path='/wallet' exact component={() => <p>wallet</p>} />
         </Auth>
       </Router>
     </div>
