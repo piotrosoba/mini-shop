@@ -8,6 +8,7 @@ import Drawer from './router/Drawer'
 import Auth from './Auth/Auth'
 import Dashbord from './views/Dashbord'
 import Wallet from './views/Wallet'
+import ChangePassword from './views/ChangePassword'
 
 const App = props => {
   return (
@@ -17,10 +18,10 @@ const App = props => {
           <AppBar />
           <Drawer />
           <Route path='/' exact component={Dashbord} />
-          <Route path='/profile' exact component={() => <p>bedzie profil</p>} />
-          <Route path='/change-password' exact component={() => <p>change password</p>} />
-          <Route path='/basket' exact component={() => <p>basket</p>} />
-          <Route path='/wallet' exact component={Wallet} />
+          <Route path='/profile' component={() => <p>bedzie profil</p>} />
+          <Route path='/change-password' component={ChangePassword} />
+          <Route path='/basket' component={() => <p>basket</p>} />
+          <Route path='/wallet' component={Wallet} />
         </Auth>
       </Router>
     </div>

@@ -45,7 +45,7 @@ const Wallet = props => {
               props._updateWallet(cash)
           }}
         >
-          Recharge
+          ADD
         </Button>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { fullScreenCircural } from './fullScreenCircural'
 import { addSnackbarActionCreator } from './snackbars'
 import { saveUserAcyncActionCreator, getUserFromBaseAsyncActionCreator } from './user'
 
-import { REGISTER_URL, LOG_IN_URL, RESET_PASSWORD, REFRESH_TOKEN_URL } from '../consts/firebase'
+import { REGISTER_URL, LOG_IN_URL, RESET_PASSWORD, REFRESH_TOKEN_URL, CHANGE_PASSWORD } from '../consts/firebase'
 
 const SAVE_DECODED_TOKEN = 'auth/SAVE_DECODED_TOKEN'
 const LOG_OUT = 'auth/LOG_OUT'
@@ -103,6 +103,48 @@ export const resetPasswordAsyncActionCreator = email => dispatch => {
       requestType: 'PASSWORD_RESET'
     }
   })
+}
+
+export const changePasswordAsyncActionCreator = (oldPassword, newPassword) => (dispatch, getState) => {
+  const authState = getState().auth
+  const email = authState.email
+  const idToken = authState.idToken
+
+  dispatch(fullScreenCircural.add())
+  return axios({
+    method: 'post',
+    url: LOG_IN_URL,
+    data: {
+      email,
+      password: oldPassword
+    }
+  })
+    .then(() => {
+      dispatch(fullScreenCircural.add())
+      return axios({
+        method: 'post',
+        url: CHANGE_PASSWORD,
+        data: {
+          idToken,
+          password: newPassword,
+          returnSecureToken: true
+        }
+      })
+        .then(r => {
+          dispatch(saveAndDecodeTokenActionCreator(r.data.idToken, r.data.refreshToken))
+          dispatch(addSnackbarActionCreator('Password changed succesfuly'))
+        })
+        .catch(() => dispatch(addSnackbarActionCreator('Something went wrong, try again later!', 'red')))
+        .finally(() => dispatch(fullScreenCircural.remove()))
+    })
+    .catch((r) => {
+      let message = 'Something went wrong, try again later!'
+      if (r.response && r.response.data.error && r.response.data.error.message === 'INVALID_PASSWORD')
+        message = 'Invalid old password'
+      dispatch(addSnackbarActionCreator(message, 'red'))
+      return r
+    })
+    .finally(() => dispatch(fullScreenCircural.remove()))
 }
 
 export const checkIsUserLoggedIn = () => (dispatch) => {

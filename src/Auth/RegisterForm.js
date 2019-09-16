@@ -44,6 +44,7 @@ const RegisterForm = props => {
   const onSubmit = () => {
     setShowCircural(true)
     props._register(email, pwd)
+      .then(props.toggleForm)
       .catch(r => {
         setShowCircural(false)
         let message = 'Something went wrong, try again later'
