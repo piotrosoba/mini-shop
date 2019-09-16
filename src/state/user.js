@@ -1,5 +1,6 @@
 import { URL } from '../consts/firebase'
-import { fetchWithToken } from './auth'
+import { fetchWithToken, fetchWithTokenAndProgress } from './auth'
+import { addSnackbarActionCreator } from './snackbars'
 
 const SAVE_USER = 'user/SAVE_USER'
 
@@ -25,6 +26,25 @@ export const saveUserAcyncActionCreator = () => (dispatch, getState) => {
   if (userId)
     return dispatch(fetchWithToken(URL + 'users/' + userId + '.json', 'patch', user))
       .then(() => dispatch(saveUserActionCreator(user)))
+}
+
+export const updateWalletActionCreator = (cash) => (dispatch, getState) => {
+  const stateUser = getState().user
+  const userId = stateUser.userId
+  const actuallWallet = stateUser.wallet
+  const cashUpdate = cash > 100 ? 100 : cash
+  const newBalance = actuallWallet + cashUpdate
+
+  return dispatch(fetchWithTokenAndProgress(URL + 'users/' + userId + '.json', 'patch', { wallet: newBalance }))
+    .then(r => {
+      dispatch(saveUserActionCreator({ ...stateUser, wallet: newBalance }))
+      dispatch(addSnackbarActionCreator(`Your new balance: ${newBalance}$`))
+      return r
+    })
+    .catch(r => {
+      dispatch(addSnackbarActionCreator('Error! Try again later', 'red'))
+      return r
+    })
 }
 
 const saveUserActionCreator = user => ({

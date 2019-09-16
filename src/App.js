@@ -7,6 +7,7 @@ import AppBar from './router/AppBar'
 import Drawer from './router/Drawer'
 import Auth from './Auth/Auth'
 import Dashbord from './views/Dashbord'
+import Wallet from './views/Wallet'
 
 const App = props => {
   return (
@@ -19,7 +20,7 @@ const App = props => {
           <Route path='/profile' exact component={() => <p>bedzie profil</p>} />
           <Route path='/change-password' exact component={() => <p>change password</p>} />
           <Route path='/basket' exact component={() => <p>basket</p>} />
-          <Route path='/wallet' exact component={() => <p>wallet</p>} />
+          <Route path='/wallet' exact component={Wallet} />
         </Auth>
       </Router>
     </div>

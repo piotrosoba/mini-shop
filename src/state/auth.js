@@ -12,7 +12,7 @@ const LOG_IN = 'auth/LOG_IN'
 
 export const fetchWithTokenAndProgress = (url, method = 'get', data = {}) => (dispatch) => {
   dispatch(fullScreenCircural.add())
-  return dispatch(fetchWithToken(url, method = 'get', data = {}))
+  return dispatch(fetchWithToken(url, method, data))
     .finally((r) => {
       dispatch(fullScreenCircural.remove())
       return r

@@ -123,7 +123,7 @@ function AppBar(props) {
 }
 
 const mapStateToProps = state => ({
-  _wallet: state.user.wallet || 0,
+  _wallet: typeof state.user.wallet === 'number' ? state.user.wallet : 0,
   _itemsInBasket: state.user.basket && Object.keys(state.user.basket).length
 })
 
