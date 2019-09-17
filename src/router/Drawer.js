@@ -19,7 +19,7 @@ const styles = {
 }
 
 const menu = [
-  { name: 'Add item', route: '/add-link' },
+  { name: 'Add item', route: '/add-item' },
   { name: 'Shop', route: '/shop' },
   { name: 'Your items', route: '/own-shop' },
   { name: 'History', route: '/history' }
