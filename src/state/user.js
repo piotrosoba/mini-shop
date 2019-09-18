@@ -25,7 +25,7 @@ export const saveUserAcyncActionCreator = () => (dispatch, getState) => {
   const user = {
     userId,
     userEmail,
-    wallet: 100
+    wallet: Number((100).toFixed(2))
   }
   if (userId)
     return dispatch(fetchWithToken(URL + 'users/' + userId + '.json', 'patch', user))
@@ -37,7 +37,7 @@ export const updateWalletActionCreator = (cash) => (dispatch, getState) => {
   const userId = stateUser.userId
   const actuallWallet = stateUser.wallet
   const cashUpdate = cash > 100 ? 100 : cash
-  const newBalance = actuallWallet + cashUpdate
+  const newBalance = Number((Number(actuallWallet) + Number(cashUpdate)).toFixed(2))
 
   return dispatch(fetchWithTokenAndProgress(URL + 'users/' + userId + '.json', 'patch', { wallet: newBalance }))
     .then(r => {
