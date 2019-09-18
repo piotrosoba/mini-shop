@@ -21,7 +21,7 @@ const App = props => {
           <Drawer />
           <Route path='/' exact component={Dashbord} />
           <Route path='/add-item' component={AddItem} />
-          <Route path='/shop' component={MainItems} />
+          <Route path='/shop/:id?' component={MainItems} />
           <Route path='/profile' component={() => <p>bedzie profil</p>} />
           <Route path='/change-password' component={ChangePassword} />
           <Route path='/basket' component={() => <p>basket</p>} />

@@ -9,6 +9,8 @@ import App from './App'
 import FullScreenCircural from './components/FullScreenCircural'
 import Snackbars from './components/Snackbars'
 
+import './main.css'
+
 store.dispatch(checkIsUserLoggedIn())
 
 ReactDOM.render(
