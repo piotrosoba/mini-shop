@@ -4,6 +4,10 @@ import { addSnackbarActionCreator } from './snackbars'
 
 const SAVE_USER = 'user/SAVE_USER'
 
+export const saveItemAsyncActionCreator = data => (dispatch, getState) => {
+  return dispatch(fetchWithTokenAndProgress(URL + 'main-items.json', 'post', data))
+}
+
 export const getUserFromBaseAsyncActionCreator = () => (dispatch, getState) => {
   const userId = getState().auth.user_id
   if (userId)

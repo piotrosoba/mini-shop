@@ -2,6 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import { connect } from 'react-redux'
+import { saveItemAsyncActionCreator } from '../state/user'
+import { addSnackbarActionCreator } from '../state/snackbars'
 
 import { TextField, Button, Typography } from '@material-ui/core'
 
@@ -37,14 +39,21 @@ const AddItem = props => {
     return isError
   }
 
-  const [price, setPrice] = React.useState(1)
+  const [price, setPrice] = React.useState(0)
   const [priceError, setPriceError] = React.useState(false)
   const priceValidate = (value = price) => {
-    const isError = false
+    if (value >= 0.01) {
+      value = Number(Number(value).toFixed(2))
+      setPrice(value)
+    }
+    const isError = value <= 0.01
     setPriceError(isError)
     return isError
   }
-  const setValidPrice = num => setPrice(num < 1 ? 1 : num > 500 ? 500 : num)
+  const setValidPrice = num => {
+    setPrice(num < 0 ? 0 : num > 500 ? 500 : num)
+  }
+
 
   const [photo, setPhoto] = React.useState('')
   const [photoError, setPhotoError] = React.useState(false)
@@ -55,11 +64,23 @@ const AddItem = props => {
   }
 
   const onSubmit = () => {
-    const name = nameValidate()
-    const description = descriptionValidate()
-    const photo = photoValidate()
-    if (!name && !description && !photo) {
-      console.log(' jest ok')
+    const nameError = nameValidate()
+    const descriptionError = descriptionValidate()
+    const photoError = photoValidate()
+    const priceError = priceValidate()
+    if (!nameError && !descriptionError && !photoError && !priceError) {
+      const item = { name, description, price, photo }
+      props._saveItem(item)
+        .then(() => {
+          setName('')
+          setPhoto('')
+          setPrice(1)
+          setDescription('')
+          props._snackbar('Item added')
+        })
+        .catch(() => {
+          props._snackbar('Something went wrong, try again later', 'red')
+        })
     }
   }
 
@@ -93,6 +114,7 @@ const AddItem = props => {
       value: price,
       change: setValidPrice,
       error: priceError,
+      errorText: 'Tell the price!',
       validate: priceValidate
     },
     {
@@ -137,6 +159,17 @@ const AddItem = props => {
           placeholder={input.placeholder}
         />
       ))}
+      <Typography
+        align='center'
+        style={{ margin: '-10px 0 10px 0', cursor: 'pointer' }}
+        color='primary'
+        onClick={() => {
+          setPhoto('http://lorempixel.com/400/400/')
+          setPhotoError(false)
+        }}
+      >
+        (random photo)
+      </Typography>
       <Button
         variant='contained'
         color='primary'
@@ -151,7 +184,10 @@ const AddItem = props => {
 
 const mapStateToProps = state => ({})
 
-const mapDispatchToProps = dispatch => ({})
+const mapDispatchToProps = dispatch => ({
+  _saveItem: item => dispatch(saveItemAsyncActionCreator(item)),
+  _snackbar: (text, color) => dispatch(addSnackbarActionCreator(text, color))
+})
 
 export default connect(
   mapStateToProps,
