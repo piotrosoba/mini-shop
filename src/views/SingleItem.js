@@ -1,5 +1,9 @@
 import React from 'react'
 
+import { connect } from 'react-redux'
+import { addToBasketAsyncActionCreator } from '../state/user'
+import { fullScreenCircural } from '../state/fullScreenCircural'
+
 import { Typography, Paper, Button, TextField, InputAdornment } from '@material-ui/core'
 
 const styles = {
@@ -16,6 +20,12 @@ const SingleItem = props => {
 
   const setValidQuantity = () => {
     setQuantity(Math.round(Number(quantity < 1 ? 1 : quantity > 100 ? 100 : quantity)))
+  }
+
+  const onSubmit = () => {
+    props._startCircural()
+    props._addToBasket({ ...props.item, quantity })
+      .finally(props._endCircural)
   }
 
   if (!props.item) {
@@ -42,8 +52,6 @@ const SingleItem = props => {
       </div>
     )
   }
-
-  console.log(props)
 
   return (
     <div>
@@ -92,6 +100,7 @@ const SingleItem = props => {
           <Button
             variant='contained'
             color='primary'
+            onClick={onSubmit}
           >
             Add to basket
           </Button>
@@ -101,4 +110,13 @@ const SingleItem = props => {
   )
 }
 
-export default SingleItem
+const mapDispatchToProps = dispatch => ({
+  _addToBasket: item => dispatch(addToBasketAsyncActionCreator(item)),
+  _startCircural: () => dispatch(fullScreenCircural.add()),
+  _endCircural: () => dispatch(fullScreenCircural.remove())
+})
+
+export default connect(
+  null,
+  mapDispatchToProps
+)((SingleItem))

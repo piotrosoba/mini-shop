@@ -4,6 +4,29 @@ import { addSnackbarActionCreator } from './snackbars'
 
 const SAVE_USER = 'user/SAVE_USER'
 
+export const addToBasketAsyncActionCreator = item => (dispatch, getState) => {
+  return dispatch(getUserFromBaseAsyncActionCreator())
+    .then((r) => {
+      const stateUser = getState().user
+      let basket = stateUser.basket
+      if (basket && Array.isArray(basket)) {
+        const isAlreadyInBasketIndex = basket.findIndex(el => el.key === item.key)
+        if (isAlreadyInBasketIndex === -1) {
+          basket = [...basket, item]
+        } else
+          basket[isAlreadyInBasketIndex].quantity += item.quantity
+      } else {
+        basket = [item]
+      }
+      console.log(basket)
+      return dispatch(saveUserAcyncActionCreator({ ...stateUser, basket }))
+    })
+    .catch((r) => {
+      dispatch(addSnackbarActionCreator('Something went wrong, try again later', 'red'))
+      return r
+    })
+}
+
 export const saveItemAsyncActionCreator = data => (dispatch, getState) => {
   return dispatch(fetchWithTokenAndProgress(URL + 'main-items.json', 'post', data))
 }
@@ -18,14 +41,16 @@ export const getUserFromBaseAsyncActionCreator = () => (dispatch, getState) => {
       })
 }
 
-export const saveUserAcyncActionCreator = () => (dispatch, getState) => {
+export const saveUserAcyncActionCreator = (user) => (dispatch, getState) => {
   const stateAuth = getState().auth
   const userId = stateAuth.user_id
   const userEmail = stateAuth.email
-  const user = {
-    userId,
-    userEmail,
-    wallet: Number((100).toFixed(2))
+  if (!user) {
+    user = {
+      userId,
+      userEmail,
+      wallet: Number((100).toFixed(2))
+    }
   }
   if (userId)
     return dispatch(fetchWithToken(URL + 'users/' + userId + '.json', 'patch', user))
