@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { addToBasketAsyncActionCreator } from '../state/user'
 import { fullScreenCircural } from '../state/fullScreenCircural'
 
-import { Typography, Paper, Button, TextField, InputAdornment } from '@material-ui/core'
+import { Typography, Paper, Button, TextField, InputAdornment, Collapse, Divider } from '@material-ui/core'
 
 const styles = {
   paper: { margin: '10px auto', padding: 20, maxWidth: 600 },
@@ -12,11 +12,15 @@ const styles = {
   item: { display: 'flex' },
   itemText: { margin: 30 },
   add: { display: 'flex', justifyContent: 'flex-end', marginTop: 20 },
-  quantity: { width: 130, marginRight: 20 }
+  quantity: { width: 130, marginRight: 20 },
+  collapse: { marginTop: 20 },
+  backDiv: { display: 'flex', justifyContent: 'center' },
+  addedText: { margin: 10 }
 }
 
 const SingleItem = props => {
   const [quantity, setQuantity] = React.useState(1)
+  const [showChoosePanel, setShowChoosePanel] = React.useState(false)
 
   const setValidQuantity = () => {
     setQuantity(Math.round(Number(quantity < 1 ? 1 : quantity > 100 ? 100 : quantity)))
@@ -25,6 +29,7 @@ const SingleItem = props => {
   const onSubmit = () => {
     props._startCircural()
     props._addToBasket({ ...props.item, quantity })
+      .then(() => setShowChoosePanel(true))
       .finally(props._endCircural)
   }
 
@@ -105,6 +110,32 @@ const SingleItem = props => {
             Add to basket
           </Button>
         </div>
+        <Collapse
+          in={showChoosePanel}
+          style={styles.collapse}
+        >
+          <Divider style={styles.addedText} />
+          <Typography
+            align='center'
+            variant='h5'
+          >
+            Added {quantity} {props.item.name} to basket!
+          </Typography>
+          <div style={styles.backDiv}>
+            <Button
+              color='secondary'
+              onClick={props.goToBasket}
+            >
+              Go to basket
+            </Button>
+            <Button
+              color='primary'
+              onClick={props.back}
+            >
+              Back to shop
+            </Button>
+          </div>
+        </Collapse>
       </Paper>
     </div>
   )

@@ -47,6 +47,7 @@ class MainItems extends React.Component {
         item={item}
         id={this.props.match.params.id}
         back={() => this.props.history.push('/shop')}
+        goToBasket={() => this.props.history.push('/basket')}
       />
     }
 

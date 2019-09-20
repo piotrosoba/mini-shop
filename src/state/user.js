@@ -10,7 +10,7 @@ export const addToBasketAsyncActionCreator = item => (dispatch, getState) => {
       const stateUser = getState().user
       let basket = stateUser.basket
       if (basket && Array.isArray(basket)) {
-        const isAlreadyInBasketIndex = basket.findIndex(el => el.key === item.key)
+        const isAlreadyInBasketIndex = basket.findIndex(el => el && el.key === item.key)
         if (isAlreadyInBasketIndex === -1) {
           basket = [...basket, item]
         } else
@@ -18,7 +18,6 @@ export const addToBasketAsyncActionCreator = item => (dispatch, getState) => {
       } else {
         basket = [item]
       }
-      console.log(basket)
       return dispatch(saveUserAcyncActionCreator({ ...stateUser, basket }))
     })
     .catch((r) => {
