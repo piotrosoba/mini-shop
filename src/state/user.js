@@ -51,9 +51,13 @@ export const saveUserAcyncActionCreator = (user) => (dispatch, getState) => {
       wallet: Number((100).toFixed(2))
     }
   }
-  if (userId)
+  if (userId) {
     return dispatch(fetchWithToken(URL + 'users/' + userId + '.json', 'patch', user))
-      .then(() => dispatch(saveUserActionCreator(user)))
+      .then(r => {
+        dispatch(saveUserActionCreator(user))
+        return r
+      })
+  }
 }
 
 export const updateWalletActionCreator = (cash) => (dispatch, getState) => {

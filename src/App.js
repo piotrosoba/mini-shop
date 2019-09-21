@@ -11,6 +11,7 @@ import Wallet from './views/Wallet'
 import ChangePassword from './views/ChangePassword'
 import AddItem from './views/AddItem'
 import MainItems from './views/MainItems'
+import Basket from './views/Basket'
 
 const App = props => {
   return (
@@ -24,7 +25,7 @@ const App = props => {
           <Route path='/shop/:id?' component={MainItems} />
           <Route path='/profile' component={() => <p>bedzie profil</p>} />
           <Route path='/change-password' component={ChangePassword} />
-          <Route path='/basket' component={() => <p>basket</p>} />
+          <Route path='/basket' component={Basket} />
           <Route path='/wallet' component={Wallet} />
         </Auth>
       </Router>
