@@ -97,6 +97,7 @@ const AddItem = props => {
       error: nameError,
       errorText: 'Too short name, minimum 4 characters',
       validate: nameValidate,
+      submitOnEnter: true
 
     },
     {
@@ -106,7 +107,8 @@ const AddItem = props => {
       change: setDescription,
       error: descriptionError,
       errorText: 'Too short name, minimum 15 characters',
-      validate: descriptionValidate
+      validate: descriptionValidate,
+      submitOnEnter: false
     },
     {
       name: 'price',
@@ -115,7 +117,8 @@ const AddItem = props => {
       change: setValidPrice,
       error: priceError,
       errorText: 'Tell the price!',
-      validate: priceValidate
+      validate: priceValidate,
+      submitOnEnter: true
     },
     {
       name: 'photo(url)',
@@ -124,7 +127,8 @@ const AddItem = props => {
       change: setPhoto,
       error: photoError,
       errorText: 'Invalid URL, it must start with http:// or https://',
-      validate: photoValidate
+      validate: photoValidate,
+      submitOnEnter: true
     }
   ]
 
@@ -148,7 +152,7 @@ const AddItem = props => {
               input.validate(evt.target.value)
           }}
           onBlur={() => input.validate(input.value)}
-          onKeyPress={submitOnEnter}
+          onKeyPress={input.submitOnEnter ? submitOnEnter : null}
           style={styles.input}
           label={input.name}
           variant='outlined'

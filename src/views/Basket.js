@@ -58,10 +58,11 @@ const Basket = props => {
     } else {
       const date = new Date(Date.now()).toLocaleDateString()
       const newWallet = Number((props._user.wallet - totalPrice).toFixed(2))
+      const key = Math.random().toString(16).slice(7)
       const history = props._user.history ?
-        [{ items: props._user.basket, date, totalPrice }, ...props._user.history]
+        [{ items: props._user.basket, date, totalPrice, key }, ...props._user.history]
         :
-        [{ items: props._user.basket, date, totalPrice }]
+        [{ items: props._user.basket, date, totalPrice, key }]
       props._startCircural()
       props._saveUser({
         ...props._user,
@@ -90,7 +91,7 @@ const Basket = props => {
     )
   }
 
-  if (!props._user.basket || props._user.basket.length === 0) {
+  if (!props._user.basket || !Array.isArray(props._user.basket) || props._user.basket.length === 0) {
     return (
       <div>
         <Paper

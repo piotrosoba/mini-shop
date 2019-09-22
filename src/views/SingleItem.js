@@ -83,6 +83,7 @@ const SingleItem = props => {
           </Typography>
             <Typography
               variant='subtitle1'
+              style={{ whiteSpace: 'pre-line' }}
             >
               {props.item.description}
             </Typography>

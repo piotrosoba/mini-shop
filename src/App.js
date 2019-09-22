@@ -12,6 +12,7 @@ import ChangePassword from './views/ChangePassword'
 import AddItem from './views/AddItem'
 import MainItems from './views/MainItems'
 import Basket from './views/Basket'
+import History from './views/History'
 
 const App = props => {
   return (
@@ -27,6 +28,7 @@ const App = props => {
           <Route path='/change-password' component={ChangePassword} />
           <Route path='/basket' component={Basket} />
           <Route path='/wallet' component={Wallet} />
+          <Route path='/history' component={History} />
         </Auth>
       </Router>
     </div>
