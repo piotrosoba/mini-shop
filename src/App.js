@@ -13,6 +13,7 @@ import AddItem from './views/AddItem'
 import MainItems from './views/MainItems'
 import Basket from './views/Basket'
 import History from './views/History'
+import UserItems from './views/UserItems'
 
 const App = props => {
   return (
@@ -24,6 +25,7 @@ const App = props => {
           <Route path='/' exact component={Dashbord} />
           <Route path='/add-item' component={AddItem} />
           <Route path='/shop/:id?' component={MainItems} />
+          <Route path='/own-shop/:id?' component={UserItems} />
           <Route path='/profile' component={() => <p>bedzie profil</p>} />
           <Route path='/change-password' component={ChangePassword} />
           <Route path='/basket' component={Basket} />

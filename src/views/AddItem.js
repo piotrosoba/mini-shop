@@ -168,7 +168,7 @@ const AddItem = props => {
         style={{ margin: '-10px 0 10px 0', cursor: 'pointer' }}
         color='primary'
         onClick={() => {
-          setPhoto('http://lorempixel.com/400/400/')
+          setPhoto('https://source.unsplash.com/user/erondu/400x400')
           setPhotoError(false)
         }}
       >

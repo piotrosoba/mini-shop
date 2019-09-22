@@ -27,7 +27,13 @@ export const addToBasketAsyncActionCreator = item => (dispatch, getState) => {
 }
 
 export const saveItemAsyncActionCreator = data => (dispatch, getState) => {
-  return dispatch(fetchWithTokenAndProgress(URL + 'main-items.json', 'post', data))
+  const userId = getState().auth.user_id
+  return dispatch(fetchWithTokenAndProgress(URL + 'users/' + userId + '/ownShop.json', 'post', data))
+}
+
+export const removeItemAsyncActionCreator = (key) => (dispatch, getState) => {
+  const userId = getState().auth.user_id
+  return dispatch(fetchWithTokenAndProgress(URL + 'users/' + userId + '/ownShop/' + key + '.json', 'delete'))
 }
 
 export const getUserFromBaseAsyncActionCreator = () => (dispatch, getState) => {

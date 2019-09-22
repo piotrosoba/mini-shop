@@ -56,6 +56,7 @@ class MainItems extends React.Component {
         <ItemsList
           data={this.props._data}
           history={this.props.history}
+          to='/shop/'
         />
       </div>
     )

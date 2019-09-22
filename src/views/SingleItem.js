@@ -4,11 +4,13 @@ import { connect } from 'react-redux'
 import { addToBasketAsyncActionCreator } from '../state/user'
 import { fullScreenCircural } from '../state/fullScreenCircural'
 
+import errorImg from '../img/img-placeholder.svg'
+
 import { Typography, Paper, Button, TextField, InputAdornment, Collapse, Divider } from '@material-ui/core'
 
 const styles = {
   paper: { margin: '10px auto', padding: 20, maxWidth: 600 },
-  photo: { maxWidth: 250, maxHeight: 250 },
+  photo: { width: 250, height: 250 },
   item: { display: 'flex' },
   itemText: { margin: 30 },
   add: { display: 'flex', justifyContent: 'flex-end', marginTop: 20 },
@@ -67,9 +69,11 @@ const SingleItem = props => {
           style={styles.item}
         >
           <img
+            className='avatar'
             alt={props.item.name}
             src={props.item.photo}
             style={styles.photo}
+            onError={evt => evt.target.src = errorImg}
           />
 
           <div
@@ -111,6 +115,25 @@ const SingleItem = props => {
             Add to basket
           </Button>
         </div>
+        {props.removeAndEdit ?
+          <div
+            style={styles.add}
+          >
+            <Button
+              color='primary'
+            >
+              Edit
+            </Button>
+            <Button
+              color='secondary'
+              onClick={props.remove}
+            >
+              Remove
+            </Button>
+          </div>
+          :
+          null
+        }
         <Collapse
           in={showChoosePanel}
           style={styles.collapse}
