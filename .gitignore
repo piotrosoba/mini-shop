@@ -24,3 +24,7 @@ yarn-error.log*
 
 # my
 firebase.html
+firebase-debug.log
+.firebaserc
+firebase.json
+/.firebase
