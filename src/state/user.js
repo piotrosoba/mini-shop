@@ -36,6 +36,11 @@ export const removeItemAsyncActionCreator = (key) => (dispatch, getState) => {
   return dispatch(fetchWithTokenAndProgress(URL + 'users/' + userId + '/ownShop/' + key + '.json', 'delete'))
 }
 
+export const editItemAsyncActionCreator = (item, key) => (dispatch, getState) => {
+  const userId = getState().auth.user_id
+  return dispatch(fetchWithTokenAndProgress(URL + 'users/' + userId + '/ownShop/' + key + '.json', 'patch', item))
+}
+
 export const getUserFromBaseAsyncActionCreator = () => (dispatch, getState) => {
   const userId = getState().auth.user_id
   if (userId)

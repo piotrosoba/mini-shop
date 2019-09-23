@@ -26,7 +26,6 @@ const App = props => {
           <Route path='/add-item' component={AddItem} />
           <Route path='/shop/:id?' component={MainItems} />
           <Route path='/own-shop/:id?' component={UserItems} />
-          <Route path='/profile' component={() => <p>bedzie profil</p>} />
           <Route path='/change-password' component={ChangePassword} />
           <Route path='/basket' component={Basket} />
           <Route path='/wallet' component={Wallet} />

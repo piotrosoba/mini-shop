@@ -47,6 +47,8 @@ export const fetchWithToken = (url, method = 'get', data = {}) => (dispatch, get
             method,
             data
           }))
+      } else {
+        return Promise.reject(r)
       }
     })
 }

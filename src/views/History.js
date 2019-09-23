@@ -35,6 +35,7 @@ const History = props => {
       {props._history.map(record => (
         <ExpansionPanel key={record.key}>
           <ExpansionPanelSummary
+            style={{ backgroundColor: 'rgba(0, 0, 0, .03)', borderBottom: '1px solid rgba(0, 0, 0, .125)' }}
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1a-content"
             id="panel1a-header"

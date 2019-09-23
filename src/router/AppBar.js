@@ -92,14 +92,6 @@ function AppBar(props) {
                       <MenuItem
                         onClick={evt => {
                           closeMenu(evt)
-                          props.history.push('/profile')
-                        }}
-                      >
-                        Profile
-                        </MenuItem>
-                      <MenuItem
-                        onClick={evt => {
-                          closeMenu(evt)
                           props.history.push('/change-password')
                         }}
                       >

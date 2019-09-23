@@ -105,10 +105,6 @@ const LogInForm = props => {
         >
           Please log in!
         </Typography>
-        <Typography
-          align='center'>
-          (you can use: example@example.com / 12345678)
-        </Typography>
         <TextField
           value={email}
           onChange={(evt) => {

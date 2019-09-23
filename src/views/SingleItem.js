@@ -7,6 +7,7 @@ import { fullScreenCircural } from '../state/fullScreenCircural'
 import errorImg from '../img/img-placeholder.svg'
 
 import { Typography, Paper, Button, TextField, InputAdornment, Collapse, Divider } from '@material-ui/core'
+import EditItem from './EditItem'
 
 const styles = {
   paper: { margin: '10px auto', padding: 20, maxWidth: 600 },
@@ -23,6 +24,7 @@ const styles = {
 const SingleItem = props => {
   const [quantity, setQuantity] = React.useState(1)
   const [showChoosePanel, setShowChoosePanel] = React.useState(false)
+  const [isItemEdditing, setIsItemEdditing] = React.useState(false)
 
   const setValidQuantity = () => {
     setQuantity(Math.round(Number(quantity < 1 ? 1 : quantity > 100 ? 100 : quantity)))
@@ -67,6 +69,7 @@ const SingleItem = props => {
       >
         <div
           style={styles.item}
+          className='single-item--info'
         >
           <img
             className='avatar'
@@ -119,8 +122,14 @@ const SingleItem = props => {
           <div
             style={styles.add}
           >
+            <EditItem
+              isOpen={isItemEdditing}
+              item={props.item}
+              close={() => setIsItemEdditing(false)}
+            />
             <Button
               color='primary'
+              onClick={() => setIsItemEdditing(true)}
             >
               Edit
             </Button>

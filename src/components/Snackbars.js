@@ -7,7 +7,7 @@ import { SnackbarContent } from '@material-ui/core';
 
 const Snackbars = props => {
   return (
-    <div style={{ position: 'fixed', bottom: 0 }}>
+    <div style={{ position: 'fixed', bottom: 0, zIndex: 100000 }}>
       {props._snackbars.map((snackbar, index) => (
         <MuiSnackbar
           key={snackbar.key}

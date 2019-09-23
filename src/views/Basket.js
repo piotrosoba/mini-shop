@@ -48,7 +48,9 @@ const Basket = props => {
 
   const removeItem = i => {
     const newBasket = props._user.basket.filter((el, index) => index !== i)
+    props._startCircural()
     props._saveUser({ ...props._user, basket: newBasket })
+      .finally(props._endCircural)
   }
 
   const onSubmit = () => {
