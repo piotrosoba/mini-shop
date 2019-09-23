@@ -51,7 +51,8 @@ export const getUserFromBaseAsyncActionCreator = () => (dispatch, getState) => {
       })
 }
 
-export const saveUserAcyncActionCreator = (user) => (dispatch, getState) => {
+export const saveUserAcyncActionCreator = (user, dontWaitOnResolve) => (dispatch, getState) => {
+  const oldUser = getState().user
   const stateAuth = getState().auth
   const userId = stateAuth.user_id
   const userEmail = stateAuth.email
@@ -63,10 +64,17 @@ export const saveUserAcyncActionCreator = (user) => (dispatch, getState) => {
     }
   }
   if (userId) {
+    if (dontWaitOnResolve === true)
+      dispatch(saveUserActionCreator(user))
     return dispatch(fetchWithToken(URL + 'users/' + userId + '.json', 'patch', user))
       .then(r => {
-        dispatch(saveUserActionCreator(user))
+        if (dontWaitOnResolve !== true)
+          dispatch(saveUserActionCreator(user))
         return r
+      })
+      .catch(r => {
+        dispatch(saveUserActionCreator(oldUser))
+        return Promise.reject(r)
       })
   }
 }

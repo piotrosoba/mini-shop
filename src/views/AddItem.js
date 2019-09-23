@@ -69,7 +69,7 @@ const AddItem = props => {
     const photoError = photoValidate()
     const priceError = priceValidate()
     if (!nameError && !descriptionError && !photoError && !priceError) {
-      const item = { name, description, price, photo }
+      const item = { name, description, price, photo, userItem: true }
       props._saveItem(item)
         .then(() => {
           setName('')

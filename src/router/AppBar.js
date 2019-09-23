@@ -33,7 +33,7 @@ function AppBar(props) {
     setOpenMenu(false)
   }
   return (
-    <div style={{ height: 60 }}>
+    <div className='appbar--div'>
       <MuiAppBar >
         <Toolbar>
           <IconButton

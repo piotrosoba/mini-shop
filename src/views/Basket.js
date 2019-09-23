@@ -6,51 +6,40 @@ import { saveUserAcyncActionCreator } from '../state/user'
 import { fullScreenCircural } from '../state/fullScreenCircural'
 import { addSnackbarActionCreator } from '../state/snackbars'
 
-import { Paper, Typography, Divider, Button, TextField, InputAdornment, Link as MuiLink } from '@material-ui/core'
+import { Paper, Typography, Divider, Button, Link as MuiLink, IconButton } from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add'
+import RemoveIcon from '@material-ui/icons/Remove'
+import DeleteIcon from '@material-ui/icons/Delete'
+
 
 const styles = {
   paper: { margin: '10px auto', padding: 20, maxWidth: 600 },
   div: { margin: '20px 0' },
   divider: { marginLeft: '20%', marginTop: 5 },
   textField: { width: 50 },
-  buyItDiv: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: 20 }
+  buyItDiv: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: 20 },
+  iconButton: { margin: 5 },
+  icons: { display: 'flex' },
+  itemContent: { display: 'flex', }
 }
 
 const Basket = props => {
   let totalPrice = 0
 
-  const basketLength = props._user.basket && props._user.basket.length
-
-  const [isEdit, setIsEdit] = React.useState(basketLength ? new Array(basketLength).fill(false) : null)
-  const [editedQuantity, setEditedQuantity] = React.useState(1)
   const [enoughtMoney, setEnoughtMoney] = React.useState(false)
   const [buyed, setBuyed] = React.useState(false)
 
-  const toggleEditItem = (i, quantity) => {
-    setEditedQuantity(quantity)
-    setIsEdit(isEdit.map((el, index) => i === index ? true : false))
-  }
-
-  const setValidEditedQuantity = (i) => {
-    setIsEdit(isEdit.map(() => false))
+  const setValidEditedQuantity = (i, editedQuantity) => {
     const newQuantity = Math.round(Number(editedQuantity < 1 ? 1 : editedQuantity > 100 ? 100 : editedQuantity))
-    setEditedQuantity(newQuantity)
     const newBasket = props._user.basket.map((item, index) => index !== i ? item : { ...item, quantity: newQuantity })
-    props._startCircural()
-    props._saveUser({ ...props._user, basket: newBasket })
-      .finally(props._endCircural)
-  }
-
-  const setValidEditedQuantityOnEnter = (key, i) => {
-    if (key === 'Enter')
-      setValidEditedQuantity(i)
+    props._saveUser({ ...props._user, basket: newBasket }, true)
+      .catch(() => props._snackbar('Couldn\'t save your changes in database! Try again later', 'red'))
   }
 
   const removeItem = i => {
     const newBasket = props._user.basket.filter((el, index) => index !== i)
-    props._startCircural()
-    props._saveUser({ ...props._user, basket: newBasket })
-      .finally(props._endCircural)
+    props._saveUser({ ...props._user, basket: newBasket }, true)
+      .catch(() => props._snackbar('Couldn\'t save your changes in database! Try again later', 'red'))
   }
 
   const onSubmit = () => {
@@ -124,60 +113,46 @@ const Basket = props => {
               key={item.key}
               style={styles.div}
             >
-              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', flexGrow: 1, flexWrap: 'wrap' }}>
-                  <Typography
-                    style={{ fontSize: 20 }}
-                    variant='subtitle1'
+              <div style={styles.itemContent}>
+                <Typography
+                  style={{ fontSize: 20, flexGrow: 1 }}
+                  variant='subtitle1'
+                >
+                  <Link
+                    to={(item.userItem ? '/own-shop/' : '/shop/') + item.key}
+                    style={{ textDecoration: 'none' }}
                   >
-                    <Link
-                      to={'/shop/' + item.key}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      {item.name}
-                    </Link>
-                    &nbsp;x&nbsp;
+                    {item.name}
+                  </Link>
+                  &nbsp;x {item.quantity} x {item.price}$ = {(item.quantity * item.price).toFixed(2)}$
                   </Typography>
-                  {isEdit[index] ?
-                    <TextField
-                      value={editedQuantity}
-                      onChange={evt => setEditedQuantity(evt.target.value)}
-                      onBlur={() => setValidEditedQuantity(index)}
-                      onKeyPress={evt => setValidEditedQuantityOnEnter(evt.key, index)}
-                      style={styles.textField}
-                      autoFocus
-                      type='number'
-                      InputProps={{
-                        startAdornment: <InputAdornment position="start">&nbsp;</InputAdornment>,
-                      }}
-                    />
-                    :
-                    <Typography
-                      style={{ fontSize: 20 }}
-                      variant='subtitle1'
-                    >
-                      {item.quantity}
-                    </Typography>}
-                  <Typography
-                    style={{ fontSize: 20 }}
-                    variant='subtitle1'
+                <div
+                  style={styles.icons}
+                  className='basket--icons'
+                >
+                  <IconButton
+                    style={styles.iconButton}
+                    color="primary"
+                    size='small'
+                    onClick={() => setValidEditedQuantity(index, item.quantity + 1)}
                   >
-                    &nbsp;x {item.price}$ = {item.quantity * item.price}$
-                  </Typography>
-                </div>
-                <div>
-                  <Button
-                    color='primary'
-                    onClick={() => toggleEditItem(index, item.quantity)}
+                    <AddIcon />
+                  </IconButton>
+                  <IconButton
+                    style={styles.iconButton}
+                    color="secondary"
+                    size='small'
+                    onClick={() => setValidEditedQuantity(index, item.quantity - 1)}
                   >
-                    Edit
-            </Button>
-                  <Button
-                    color='secondary'
+                    <RemoveIcon />
+                  </IconButton>
+                  <IconButton
+                    size='small'
+                    style={styles.iconButton}
                     onClick={() => removeItem(index)}
                   >
-                    Remove
-            </Button>
+                    <DeleteIcon />
+                  </IconButton>
                 </div>
               </div>
               <Divider style={styles.divider} />
@@ -221,7 +196,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  _saveUser: user => dispatch(saveUserAcyncActionCreator(user)),
+  _saveUser: (user, dontWaitOnResolve) => dispatch(saveUserAcyncActionCreator(user, dontWaitOnResolve)),
   _startCircural: () => dispatch(fullScreenCircural.add()),
   _endCircural: () => dispatch(fullScreenCircural.remove()),
   _snackbar: (text, color) => dispatch(addSnackbarActionCreator(text, color))

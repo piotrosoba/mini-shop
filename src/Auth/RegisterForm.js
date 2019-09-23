@@ -39,30 +39,33 @@ const RegisterForm = props => {
     return isError
   }
 
-  const signInEnable = !!email && !!pwd && !!pwd2 && !emailError && !pwdError && !pwd2Error && pwd2 === pwd
-
   const onSubmit = () => {
-    setShowCircural(true)
-    props._register(email, pwd)
-      .then(props.toggleForm)
-      .catch(r => {
-        setShowCircural(false)
-        let message = 'Something went wrong, try again later'
-        switch (r.response && r.response.data.error && r.response.data.error.message) {
-          case 'EMAIL_EXISTS':
-            message = 'User with this email is already registered'
-            break
-          case 'OPERATION_NOT_ALLOWED':
-            message = 'This password is not allowed, try with another'
-            break
-          case 'TOO_MANY_ATTEMPTS_TRY_LATER':
-            message = 'Too many attemps, try again later'
-            break
-          default:
-            break
-        }
-        props._snackbar(message, 'red')
-      })
+    const isEmailError = emailValidate()
+    const isPwdError = pwdValidate()
+    const isPwd2Error = pwd2Validate()
+    if (!isEmailError && !isPwdError && !isPwd2Error) {
+      setShowCircural(true)
+      props._register(email, pwd)
+        .then(props.toggleForm)
+        .catch(r => {
+          setShowCircural(false)
+          let message = 'Something went wrong, try again later'
+          switch (r.response && r.response.data.error && r.response.data.error.message) {
+            case 'EMAIL_EXISTS':
+              message = 'User with this email is already registered'
+              break
+            case 'OPERATION_NOT_ALLOWED':
+              message = 'This password is not allowed, try with another'
+              break
+            case 'TOO_MANY_ATTEMPTS_TRY_LATER':
+              message = 'Too many attemps, try again later'
+              break
+            default:
+              break
+          }
+          props._snackbar(message, 'red')
+        })
+    }
   }
 
   const submitOnEnter = evt => {
@@ -147,7 +150,6 @@ const RegisterForm = props => {
             variant='contained'
             onClick={onSubmit}
             margin='normal'
-            disabled={!signInEnable}
           >
             Sign in
           </Button>

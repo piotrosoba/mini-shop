@@ -17,7 +17,7 @@ const ItemsList = props => {
         <Paper
           key={item.key}
           style={styles.paper}
-          onClick={() => props.history.push(props.to + item.key)}
+          onClick={() => props.history.push(props.route + item.key)}
           className='list-item__paper'
         >
           <ListItem alignItems="flex-start">

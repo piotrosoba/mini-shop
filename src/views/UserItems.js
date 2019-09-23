@@ -78,7 +78,7 @@ class UserItems extends React.Component {
         <ItemsList
           data={this.props._data}
           history={this.props.history}
-          to='/own-shop/'
+          route='/own-shop/'
         />
       </div>
     )

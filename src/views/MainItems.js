@@ -46,6 +46,7 @@ class MainItems extends React.Component {
       return <SingleItem
         item={item}
         id={this.props.match.params.id}
+        route='/shop/'
         back={() => this.props.history.push('/shop')}
         goToBasket={() => this.props.history.push('/basket')}
       />

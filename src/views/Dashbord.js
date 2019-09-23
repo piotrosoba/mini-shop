@@ -23,6 +23,11 @@ const Dashbord = props => {
         Used technologies: React, Redux, Firebase, Axios, Material-UI.
         <br />
         <br />
+        I'm still working on this application so if you find some bug or have suggestions contact me:
+        <br />
+        piotrosoba@outlook.com
+        <br />
+        <br />
         About:
       </Typography>
       <Typography
